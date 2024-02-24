@@ -7,6 +7,11 @@ DATA_DIR = config('DATA_DIR', default=BASE_DIR / 'data/', cast=Path)
 OUTPUT_DIR = config('OUTPUT_DIR', default=BASE_DIR / 'output/', cast=Path)
 WRDS_USERNAME = config("WRDS_USERNAME", default="")
 
+USE_BBG = False
+START_DT = "1988-01-29"
+PAPER_END_DT = "2017-06-30"
+
+
 if __name__ == "__main__":
     
     ## If they don't exist, create the data and output directories
