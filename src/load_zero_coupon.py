@@ -29,6 +29,7 @@ def load_fed_yield_curve(data_dir=DATA_DIR):
 
 if __name__ == "__main__":
     df = pull_fed_yield_curve()
+    print(df)
     path = Path(DATA_DIR) / "pulled" / "fed_yield_curve.parquet"
     # df.loc['1988-01-29':'2017-06-30', ['SVENY01']].to_csv(DATA_DIR / "pulled" / 'one_year_zc.csv')
     df.to_parquet(path)
