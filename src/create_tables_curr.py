@@ -2,7 +2,7 @@ import pandas as pd
 import load_zero_coupon as ldzc
 import load_bbg_data as lbbg
 import clean_data as cld
-import create_table_1 as ct
+import create_tables as ct
 import config
 import numpy as np
 import math
