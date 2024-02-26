@@ -17,7 +17,7 @@ if USE_BBG:
 else:
     bbg_df = lbbg.load_bbg_data(data_dir=DATA_DIR)
 
-df = clean_data.clean_one_year_zc(bbg_df.index, PAPER_END_DT, DATA_DIR)
+df = clean_data.clean_one_year_zc(bbg_df.index, DATA_DIR)
 
 def test_clean_one_year_zc():
     # Check start and end date
@@ -25,13 +25,14 @@ def test_clean_one_year_zc():
     assert df.index.max() <= pd.to_datetime(PAPER_END_DT)
     
     # Check the column rename
-    assert '1_year_yield' in df.columns
+    assert 'SVENY01' in df.columns
 
     # Check for no missing values in the resulting DataFrame
     assert not df.isnull().values.any()
 
     # Check if '1_y_dis_factor' is calculated correctly
-    assert all(df['1_y_dis_factor'] > 0)
+    assert all(df['SVENY01'] > 0)
     
     # Check if the expected discount factor is calculated directly
-    assert np.isclose(df.loc['2017-02-28', '1_y_dis_factor'], 0.990878)
+    assert np.isclose(df.loc['2017-02-28', 'SVENY01'], 0.990878)
+    
