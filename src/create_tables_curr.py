@@ -25,4 +25,7 @@ if __name__ == "__main__":
 
     # Table 1
     print(ct.calc_table_1(pr_t, pd_t))
+
+    # Table 2
+    print(ct.calc_table_2(bbg_df['index'], pr_t, pd_t))
     
