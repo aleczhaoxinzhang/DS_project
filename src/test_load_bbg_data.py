@@ -36,5 +36,3 @@ def test_load_bbg_data_specific_values():
     assert np.isclose(df.loc['1988-01-29', 'dividend yield'], 3.4909, atol=1e-4), "Incorrect 'dividend yield' value for 1988-01-29"
     assert np.isclose(df.loc['1988-02-29', 'index'], 267.82, atol=1e-2), "Incorrect 'index' value for 1988-02-29"
     assert np.isclose(df.loc['2017-06-30', 'futures'], 2421.00, atol=1e-2), "Incorrect 'futures' value for 2017-06-30"
-
-
