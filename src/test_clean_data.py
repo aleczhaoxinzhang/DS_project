@@ -13,11 +13,43 @@ DATA_DIR = config.DATA_DIR
 USE_BBG = config.USE_BBG
 
 if USE_BBG:
-        bbg_df = clean_data.clean_bbg_data(data_dir=DATA_DIR)
+    bbg_df = clean_data.clean_bbg_data(data_dir=DATA_DIR)
 else:
     bbg_df = lbbg.load_bbg_data(data_dir=DATA_DIR)
 
-df = clean_data.clean_one_year_zc(bbg_df.index, DATA_DIR)
+def test_clean_bbg_data():
+    # Check that the DataFrame is not empty
+    assert not bbg_df.empty
+    
+    # Check that the index is a DatetimeIndex
+    assert isinstance(bbg_df.index, pd.DatetimeIndex)
+    
+    # Check start and end date
+    assert bbg_df.index.min() >= pd.to_datetime(START_DT)
+    assert bbg_df.index.max() <= pd.to_datetime(PAPER_END_DT)
+    
+    # Check the column names
+    expected_columns = ['dividend yield', 'index', 'futures']
+    assert all(col in bbg_df.columns for col in expected_columns)
+
+    # Check for no missing values in the resulting DataFrame
+    assert not bbg_df.isnull().values.any()
+
+    # Check if data is grouped by year and month and last date is selected
+    grouped_df = bbg_df.groupby([bbg_df.index.year, bbg_df.index.month])
+    for _, group in grouped_df:
+        assert group.index[-1] == bbg_df.loc[group.index].index[-1]
+    
+    # Check that the DataFrame has approximately monthly frequency
+    assert all(bbg_df.index[i + 1] - bbg_df.index[i] <= pd.Timedelta(days=35) for i in range(len(bbg_df.index) - 1))
+
+    # Check data types
+    assert bbg_df.dtypes['dividend yield'] == float
+    assert bbg_df.dtypes['index'] == float
+    assert bbg_df.dtypes['futures'] == float
+
+
+#df = clean_data.clean_one_year_zc(bbg_df.index, DATA_DIR)
 
 def test_clean_one_year_zc():
     # Check start and end date
