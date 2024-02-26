@@ -57,14 +57,14 @@ def test_clean_one_year_zc():
     assert df.index.max() <= pd.to_datetime(PAPER_END_DT)
     
     # Check the column rename
-    assert 'SVENY01' in df.columns
+    assert '1_year_yield' in df.columns
 
     # Check for no missing values in the resulting DataFrame
     assert not df.isnull().values.any()
 
     # Check if '1_y_dis_factor' is calculated correctly
-    assert all(df['SVENY01'] > 0)
+    assert all(df['1_year_yield'] > 0)
     
     # Check if the expected discount factor is calculated directly
-    assert np.isclose(df.loc['2017-02-28', 'SVENY01'], 0.990878)
+    assert np.isclose(df.loc['2017-02-28', '1_y_dis_factor'], 0.990878)
     
