@@ -2,9 +2,11 @@ import pandas as pd
 import requests
 from io import BytesIO
 from pathlib import Path
-
 import config
+
 DATA_DIR = config.DATA_DIR
+START_DT = config.START_DT
+PAPER_END_DT = config.PAPER_END_DT
 
 
 def pull_fed_yield_curve():
@@ -30,5 +32,5 @@ def load_fed_yield_curve(data_dir=DATA_DIR):
 if __name__ == "__main__":
     df = pull_fed_yield_curve()
     path = Path(DATA_DIR) / "pulled" / "fed_yield_curve.parquet"
-    # df.loc['1988-01-29':'2017-06-30', ['SVENY01']].to_csv(DATA_DIR / "pulled" / 'one_year_zc.csv')
+    # df.loc[START_DT : PAPER_END_DT, ['SVENY01']].to_csv(DATA_DIR / "pulled" / 'one_year_zc.csv')
     df.to_parquet(path)
