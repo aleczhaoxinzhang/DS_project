@@ -51,3 +51,4 @@ if __name__ == "__main__":
     path = Path(DATA_DIR) / "pulled" / "bbg_data.parquet"
     bbg_df.to_parquet(path)
     # print(bbg_df['futures'])
+    
