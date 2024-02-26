@@ -49,7 +49,7 @@ def test_clean_bbg_data():
     assert bbg_df.dtypes['futures'] == float
 
 
-#df = clean_data.clean_one_year_zc(bbg_df.index, DATA_DIR)
+df = clean_data.clean_one_year_zc(bbg_df.index, DATA_DIR)
 
 def test_clean_one_year_zc():
     # Check start and end date
