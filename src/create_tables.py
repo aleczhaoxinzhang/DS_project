@@ -5,6 +5,7 @@ import clean_data as cld
 import config
 import numpy as np
 import math
+import statsmodels.api as sm
 
 DATA_DIR = config.DATA_DIR
 USE_BBG = config.USE_BBG
