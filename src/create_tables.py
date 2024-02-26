@@ -48,6 +48,37 @@ def calc_table_1(series1, series2):
     return stats_df.transpose()
 
 
+def calc_regressions(X, y):
+    X = sm.add_constant(X)  # Add a constant term
+    model = sm.OLS(y, X).fit()
+    return model.params.iloc[0], model.rsquared_adj  # Return beta and adjusted R-squared
+
+def calc_table_2(index, pr_t, pd_t):
+    # Calculate epsilon_pr_t and epsilon_pd_t
+    epsilon_pr_t = pr_t - sm.OLS(pr_t, sm.add_constant(pd_t)).fit().predict()
+    epsilon_pd_t = pd_t - sm.OLS(pd_t, sm.add_constant(pr_t)).fit().predict()
+    
+    # Calculate future one-year S&P 500 returns
+    sp500_returns = (index.shift(-12) / index - 1)  # Assuming index is sorted by date
+    
+    # Limit to in-sample data
+    in_sample = (index.index >= '1988-01-29') & (index.index <= '1997-11-30')
+    sp500_returns = sp500_returns[in_sample]
+    pr_t = pr_t[in_sample]
+    pd_t = pd_t[in_sample]
+    epsilon_pr_t = epsilon_pr_t[in_sample]
+    epsilon_pd_t = epsilon_pd_t[in_sample]
+    
+    # Perform regressions and collect results
+    results = pd.DataFrame(index=['beta', 'adjusted R-squared'], columns=['pr_t', 'pd_t', 'epsilon_pr_t', 'epsilon_pd_t'])
+    for var, name in zip([pr_t, pd_t, epsilon_pr_t, epsilon_pd_t], results.columns):
+        beta, adj_r_squared = calc_regressions(var, sp500_returns)
+        results.loc['beta', name] = beta
+        results.loc['adjusted R-squared', name] = adj_r_squared
+    
+    return results
+
+
 if __name__ == "__main__":
     if USE_BBG:
         bbg_df = cld.clean_bbg_data(PAPER_END_DT, data_dir=DATA_DIR)
@@ -61,4 +92,7 @@ if __name__ == "__main__":
 
     # Table 1
     print(calc_table_1(pr_t, pd_t))
+
+    # Table 2
+    print(calc_table_2(bbg_df['index'], pr_t, pd_t))
     
