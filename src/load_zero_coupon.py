@@ -35,3 +35,4 @@ if __name__ == "__main__":
     path = Path(DATA_DIR) / "pulled" / "fed_yield_curve.parquet"
     # df.loc[START_DT : PAPER_END_DT, ['SVENY01']].to_csv(DATA_DIR / "pulled" / 'one_year_zc.csv')
     df.to_parquet(path)
+    

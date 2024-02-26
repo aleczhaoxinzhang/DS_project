@@ -61,3 +61,4 @@ if __name__ == "__main__":
 
     # Table 1
     print(calc_table_1(pr_t, pd_t))
+    
