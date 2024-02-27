@@ -20,6 +20,13 @@ if USE_BBG:
         
         # Group by year and month, and select the last date in each group
         return df.groupby([df.index.year, df.index.month]).tail(1)
+else:
+    def clean_bbg_data(end_date, data_dir=DATA_DIR):
+        df = lbbg.load_bbg_data(data_dir)
+
+        df = df.loc[START_DT : end_date]
+
+        return df
 
 
 def clean_one_year_zc(dates_select, end_date, data_dir=DATA_DIR):
@@ -45,11 +52,7 @@ def clean_one_year_zc(dates_select, end_date, data_dir=DATA_DIR):
 
 
 if __name__ == "__main__":
-    if USE_BBG:
-        bbg_df = clean_bbg_data(PAPER_END_DT, data_dir=DATA_DIR)
-    else:
-        bbg_df = lbbg.load_bbg_data(data_dir=DATA_DIR)
-
+    bbg_df = clean_bbg_data(PAPER_END_DT, data_dir=DATA_DIR)
     one_year_zc_df = clean_one_year_zc(bbg_df.index, PAPER_END_DT, data_dir=DATA_DIR)
     # print(one_year_zc_df)
 
