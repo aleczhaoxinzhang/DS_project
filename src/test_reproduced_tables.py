@@ -1,4 +1,3 @@
-import pytest
 import pandas as pd
 import numpy as np
 import create_tables_curr as ct
