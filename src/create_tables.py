@@ -65,7 +65,7 @@ def calc_table_2(index, pr_t, pd_t):
     sp500_returns = (index.shift(-12) / index - 1)  # Assuming index is sorted by date
     
     # Limit to in-sample data
-    in_sample = (index.index >= '1988-01-29') & (index.index <= '1997-11-30')
+    in_sample = (index.index >= '1988-01-29') & (index.index <= '1997-12-31')
     sp500_returns = sp500_returns[in_sample]
     pr_t = pr_t[in_sample]
     pd_t = pd_t[in_sample]
@@ -83,11 +83,7 @@ def calc_table_2(index, pr_t, pd_t):
 
 
 if __name__ == "__main__":
-    if USE_BBG:
-        bbg_df = cld.clean_bbg_data(PAPER_END_DT, data_dir=DATA_DIR)
-    else:
-        bbg_df = lbbg.load_bbg_data(data_dir=DATA_DIR)
-
+    bbg_df = cld.clean_bbg_data(PAPER_END_DT, data_dir=DATA_DIR)
     one_year_zc_df = cld.clean_one_year_zc(bbg_df.index, PAPER_END_DT, data_dir=DATA_DIR)
 
     pr_t = calc_pr(bbg_df, one_year_zc_df)

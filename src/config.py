@@ -10,7 +10,7 @@ WRDS_USERNAME = config("WRDS_USERNAME", default="")
 USE_BBG = False
 START_DT = "1988-01-29"
 PAPER_END_DT = "2017-06-30"
-CURR_END_DT = "2024-02-29"
+CURR_END_DT = "2024-01-31"
 
 
 if __name__ == "__main__":
