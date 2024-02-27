@@ -34,6 +34,7 @@ def summary_stats(series1, series2, series3, series4, series5):
     stats_df = stats_df.transpose()
     stats_df['count'] = np.ceil(stats_df['count']).astype(int)
     stats_df = stats_df.rename(columns={'count': 'obs', 'Autocorrelation': 'ρ'})
+    stats_df.iloc[:, 1:] = stats_df.iloc[:, 1:].applymap(lambda x: '{:.3f}'.format(x))
     
     return stats_df
 

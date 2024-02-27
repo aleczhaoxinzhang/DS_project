@@ -46,6 +46,7 @@ def calc_table_1(series1, series2):
     stats_df = stats_df.transpose()
     stats_df['count'] = np.ceil(stats_df['count']).astype(int)
     stats_df = stats_df.rename(columns={'count': 'obs', 'Autocorrelation': 'ρ'})
+    stats_df.iloc[:, 1:] = stats_df.iloc[:, 1:].applymap(lambda x: '{:.3f}'.format(x))
     
     return stats_df
 
@@ -77,6 +78,8 @@ def calc_table_2(index, pr_t, pd_t):
         beta, adj_r_squared = calc_regressions(var, sp500_returns)
         results.loc['β', name] = beta.round(3)
         results.loc['R²', name] = adj_r_squared.round(3)
+    
+    results = results.applymap(lambda x: '{:.3f}'.format(x))
 
     return results
 
