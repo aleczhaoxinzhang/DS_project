@@ -7,7 +7,7 @@ import load_bbg_data as lbbg
 
 # Prepare a specific date range for testing
 START_DT = config.START_DT 
-CURR_END_DT = config.CURR_END_DT 
+CURR_END_DT = config.CURR_END_DT
 DATA_DIR = config.DATA_DIR
 
 bbg_df = cld.clean_bbg_data(CURR_END_DT, data_dir=DATA_DIR)
