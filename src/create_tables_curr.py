@@ -8,7 +8,6 @@ import numpy as np
 import math
 
 DATA_DIR = config.DATA_DIR
-USE_BBG = config.USE_BBG
 CURR_END_DT = config.CURR_END_DT
 
 

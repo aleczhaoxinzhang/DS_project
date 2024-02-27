@@ -7,7 +7,6 @@ import numpy as np
 import math
 
 DATA_DIR = config.DATA_DIR
-USE_BBG = config.USE_BBG
 PAPER_END_DT = config.PAPER_END_DT
 
 
@@ -32,8 +31,11 @@ def summary_stats(series1, series2, series3, series4, series5):
     stats_df.loc['Autocorrelation'] = [autocorr1, autocorr2, autocorr3, autocorr4, autocorr5]
 
     stats_df = stats_df.round(3)
+    stats_df = stats_df.transpose()
+    stats_df['count'] = np.ceil(stats_df['count']).astype(int)
+    stats_df = stats_df.rename(columns={'count': 'obs', 'Autocorrelation': 'ρ'})
     
-    return stats_df.transpose()
+    return stats_df
 
 
 if __name__ == "__main__":
