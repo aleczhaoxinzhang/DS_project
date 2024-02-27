@@ -40,13 +40,15 @@ def calc_table_1(series1, series2):
 
     # Combine all statistics into a DataFrame
     stats_df = pd.concat([summary1, summary2], axis=1)
-    stats_df.columns = ['pr', 'pd']
     stats_df.loc['Autocorrelation'] = [autocorr1, autocorr2]
     stats_df.loc['Correlation'] = [correlation, correlation]
 
     stats_df = stats_df.round(3)
+    stats_df = stats_df.transpose()
+    stats_df['count'] = np.ceil(stats_df['count']).astype(int)
+    stats_df = stats_df.rename(columns={'count': 'obs', 'Autocorrelation': 'ρ'})
     
-    return stats_df.transpose()
+    return stats_df
 
 
 def calc_regressions(X, y):
@@ -71,12 +73,12 @@ def calc_table_2(index, pr_t, pd_t):
     epsilon_pd_t = epsilon_pd_t[in_sample]
     
     # Perform regressions and collect results
-    results = pd.DataFrame(index=['beta', 'adjusted R-squared'], columns=['pr_t', 'pd_t', 'epsilon_pr_t', 'epsilon_pd_t'])
+    results = pd.DataFrame(index=['β', 'R²'], columns=['pr_t', 'pd_t', 'epsilon_pr_t', 'epsilon_pd_t'])
     for var, name in zip([pr_t, pd_t, epsilon_pr_t, epsilon_pd_t], results.columns):
         beta, adj_r_squared = calc_regressions(var, sp500_returns)
-        results.loc['beta', name] = beta
-        results.loc['adjusted R-squared', name] = adj_r_squared
-    
+        results.loc['β', name] = beta.round(3)
+        results.loc['R²', name] = adj_r_squared.round(3)
+
     return results
 
 
@@ -96,4 +98,5 @@ if __name__ == "__main__":
 
     # Table 2
     print(calc_table_2(bbg_df['index'], pr_t, pd_t))
+
     
