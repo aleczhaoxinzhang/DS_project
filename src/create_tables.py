@@ -8,7 +8,6 @@ import math
 import statsmodels.api as sm
 
 DATA_DIR = config.DATA_DIR
-USE_BBG = config.USE_BBG
 PAPER_END_DT = config.PAPER_END_DT
 
 
