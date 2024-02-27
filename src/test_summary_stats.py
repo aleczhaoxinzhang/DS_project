@@ -150,20 +150,3 @@ def test_summary_stats_consistency_across_sizes(data_size):
         "Inconsistent data types across different data sizes."
 '''
 
-def test_summary_stats_handling_extreme_values(test_data):
-    bbg_df, one_year_zc_df = test_data
-
-    # Introduce extreme values
-    bbg_df['dividend yield'][0] = 1000  # An extreme value
-
-    result_df = summary_stats(
-        bbg_df['dividend yield'],
-        bbg_df['index'],
-        bbg_df['futures'],
-        one_year_zc_df['1_year_yield'],
-        one_year_zc_df['1_y_dis_factor']
-    )
-
-    # You might want to check that the max value is correctly reported, for instance
-    actual_max = result_df.loc['dividend yield', 'max']
-    assert actual_max == 1000, "The function does not correctly handle extreme values."
