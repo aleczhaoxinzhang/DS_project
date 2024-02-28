@@ -46,7 +46,6 @@ def calc_table_1(series1, series2):
     stats_df = stats_df.transpose()
     stats_df['count'] = np.ceil(stats_df['count']).astype(int)
     stats_df = stats_df.rename(columns={'count': 'obs', 'Autocorrelation': 'ρ'})
-    stats_df.iloc[:, 1:] = stats_df.iloc[:, 1:].applymap(lambda x: '{:.3f}'.format(x))
     
     return stats_df
 
@@ -79,7 +78,7 @@ def calc_table_2(index, pr_t, pd_t):
         results.loc['β', name] = beta.round(3)
         results.loc['R²', name] = adj_r_squared.round(3)
     
-    results = results.applymap(lambda x: '{:.3f}'.format(x))
+    results = results.astype(float)
 
     return results
 
@@ -91,10 +90,10 @@ if __name__ == "__main__":
     pr_t = calc_pr(bbg_df, one_year_zc_df)
     pd_t = calc_pd(bbg_df)
 
-    # Table 1
-    print(calc_table_1(pr_t, pd_t))
+    #Table 1
+    print(cld.format_df(calc_table_1(pr_t, pd_t), False))
 
-    # Table 2
-    print(calc_table_2(bbg_df['index'], pr_t, pd_t))
+    #Table 2
+    print(cld.format_df(calc_table_2(bbg_df['index'], pr_t, pd_t), True))
 
     
