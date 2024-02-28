@@ -5,8 +5,10 @@ import clean_data as cld
 import config
 import numpy as np
 import math
+from pathlib import Path
 
 DATA_DIR = config.DATA_DIR
+OUTPUT_DIR = config.OUTPUT_DIR
 PAPER_END_DT = config.PAPER_END_DT
 
 
@@ -39,9 +41,12 @@ def summary_stats(series1, series2, series3, series4, series5):
 
 
 if __name__ == "__main__":
-    bbg_df = cld.clean_bbg_data(PAPER_END_DT, data_dir=DATA_DIR)
-    one_year_zc_df = cld.clean_one_year_zc(bbg_df.index, PAPER_END_DT, data_dir=DATA_DIR)
-    print(cld.format_df(summary_stats(bbg_df['dividend yield'], bbg_df['index'], 
+    bbg_df = lbbg.load_clean_bbg_data(PAPER_END_DT, data_dir=DATA_DIR)
+    one_year_zc_df = ldzc.load_clean_fed_yield_curve(PAPER_END_DT, data_dir=DATA_DIR)
+    summary_stats_df = cld.format_df(summary_stats(bbg_df['dividend yield'], bbg_df['index'], 
                                       bbg_df['futures'], one_year_zc_df['1_year_yield'], 
-                                      one_year_zc_df['1_y_dis_factor']), False))
+                                      one_year_zc_df['1_y_dis_factor']), False)
+    print(summary_stats_df)
+    path = Path(OUTPUT_DIR) / "summary_stats.tex"
+    summary_stats_df.to_latex(path, index=True)
     

@@ -42,6 +42,18 @@ def load_bbg_data(data_dir=DATA_DIR):
     _df = pd.read_parquet(path)
     return _df
 
+
+def load_clean_bbg_data(end_date, data_dir=DATA_DIR):
+    if end_date == PAPER_END_DT:
+        path = Path(DATA_DIR) / "pulled" / "clean_bbg_paper_data.parquet"
+    elif end_date == CURR_END_DT:
+        path = Path(DATA_DIR) / "pulled" / "clean_bbg_curr_data.parquet"
+    else:
+        raise ValueError("Invalid end date")
+    _df = pd.read_parquet(path)
+    return _df
+
+
 if __name__ == "__main__":
     if USE_BBG:
         bbg_df = pull_bbg_data(CURR_END_DT)
@@ -51,4 +63,5 @@ if __name__ == "__main__":
     path = Path(DATA_DIR) / "pulled" / "bbg_data.parquet"
     bbg_df.to_parquet(path)
     # print(bbg_df['futures'])
+    
     

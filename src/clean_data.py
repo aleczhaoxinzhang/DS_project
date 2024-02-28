@@ -4,11 +4,13 @@ import load_bbg_data as lbbg
 import config
 import numpy as np
 import math
+from pathlib import Path
 
 DATA_DIR = config.DATA_DIR
 USE_BBG = config.USE_BBG
 START_DT = config.START_DT
 PAPER_END_DT = config.PAPER_END_DT
+CURR_END_DT = config.CURR_END_DT
 
 if USE_BBG:
     def clean_bbg_data(end_date, data_dir=DATA_DIR):
@@ -60,9 +62,24 @@ def format_df(df, all_col):
 
 
 if __name__ == "__main__":
+    # Clean the data up to the paper end date
     bbg_df = clean_bbg_data(PAPER_END_DT, data_dir=DATA_DIR)
     one_year_zc_df = clean_one_year_zc(bbg_df.index, PAPER_END_DT, data_dir=DATA_DIR)
-    # print(one_year_zc_df)
 
+    path = Path(DATA_DIR) / "pulled" / "clean_bbg_paper_data.parquet"
+    bbg_df.to_parquet(path)
+
+    path = Path(DATA_DIR) / "pulled" / "clean_one_y_zc_paper.parquet"
+    one_year_zc_df.to_parquet(path)
+
+    # Clean the data up to the current end date
+    bbg_df = clean_bbg_data(CURR_END_DT, data_dir=DATA_DIR)
+    one_year_zc_df = clean_one_year_zc(bbg_df.index, CURR_END_DT, data_dir=DATA_DIR)
+
+    path = Path(DATA_DIR) / "pulled" / "clean_bbg_curr_data.parquet"
+    bbg_df.to_parquet(path)
+
+    path = Path(DATA_DIR) / "pulled" / "clean_one_y_zc_curr.parquet"
+    one_year_zc_df.to_parquet(path)
     
 

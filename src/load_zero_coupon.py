@@ -28,11 +28,23 @@ def load_fed_yield_curve(data_dir=DATA_DIR):
     path = data_dir / "pulled" / "fed_yield_curve.parquet"
     _df = pd.read_parquet(path)
     return _df
-    
 
+
+def load_clean_fed_yield_curve(end_date, data_dir=DATA_DIR):
+    if end_date == PAPER_END_DT:
+        path = Path(DATA_DIR) / "pulled" / "clean_one_y_zc_paper.parquet"
+    elif end_date == CURR_END_DT:
+        path = Path(DATA_DIR) / "pulled" / "clean_one_y_zc_curr.parquet"
+    else:
+        raise ValueError("Invalid end date")
+    _df = pd.read_parquet(path)
+    return _df
+    
+    
 if __name__ == "__main__":
     df = pull_fed_yield_curve()
     path = Path(DATA_DIR) / "pulled" / "fed_yield_curve.parquet"
     # df.loc[START_DT : CURR_END_DT, ['SVENY01']].to_csv(DATA_DIR / "pulled" / 'one_year_zc.csv')
     df.to_parquet(path)
+    
     
