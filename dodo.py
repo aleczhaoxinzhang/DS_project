@@ -84,10 +84,10 @@ def task_clean_data():
     return {
         'actions': ['ipython ./src/clean_data.py'],
         'targets': [
-            DATA_DIR / "cleaned" / "clean_one_y_zc_paper.parquet",
-            DATA_DIR / "cleaned" / "clean_bbg_curr_data.parquet",
-            DATA_DIR / "cleaned" / "clean_bbg_paper_data.parquet",
-            DATA_DIR / "cleaned" / "clean_one_y_zc_curr.parquet",
+            DATA_DIR / "pulled" / "clean_one_y_zc_paper.parquet",
+            DATA_DIR / "pulled" / "clean_bbg_curr_data.parquet",
+            DATA_DIR / "pulled" / "clean_bbg_paper_data.parquet",
+            DATA_DIR / "pulled" / "clean_one_y_zc_curr.parquet",
             # Add more target files as needed
         ],
         'file_dep': [
@@ -136,7 +136,7 @@ def task_summary_stats():
             # Add more target files as needed
         ],
         'file_dep': [
-            './src/summary_stats.py',
+            './src/create_summary_stats.py',
             DATA_DIR / "pulled" / "clean_one_y_zc_curr.parquet",
             DATA_DIR / "pulled" / "clean_bbg_paper_data.parquet",
             DATA_DIR / "pulled" / "clean_one_y_zc_paper.parquet",
