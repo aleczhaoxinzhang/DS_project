@@ -34,7 +34,6 @@ def summary_stats(series1, series2, series3, series4, series5):
     stats_df = stats_df.transpose()
     stats_df['count'] = np.ceil(stats_df['count']).astype(int)
     stats_df = stats_df.rename(columns={'count': 'obs', 'Autocorrelation': 'ρ'})
-    stats_df.iloc[:, 1:] = stats_df.iloc[:, 1:].applymap(lambda x: '{:.3f}'.format(x))
     
     return stats_df
 
@@ -42,6 +41,7 @@ def summary_stats(series1, series2, series3, series4, series5):
 if __name__ == "__main__":
     bbg_df = cld.clean_bbg_data(PAPER_END_DT, data_dir=DATA_DIR)
     one_year_zc_df = cld.clean_one_year_zc(bbg_df.index, PAPER_END_DT, data_dir=DATA_DIR)
-    print(summary_stats(bbg_df['dividend yield'], bbg_df['index'], bbg_df['futures'], 
-                        one_year_zc_df['1_year_yield'], one_year_zc_df['1_y_dis_factor']))
+    print(cld.format_df(summary_stats(bbg_df['dividend yield'], bbg_df['index'], 
+                                      bbg_df['futures'], one_year_zc_df['1_year_yield'], 
+                                      one_year_zc_df['1_y_dis_factor']), False))
     

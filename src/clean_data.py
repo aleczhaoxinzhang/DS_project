@@ -51,6 +51,14 @@ def clean_one_year_zc(dates_select, end_date, data_dir=DATA_DIR):
     return df_zc
 
 
+def format_df(df, all_col):
+    if all_col:
+        df = df.applymap(lambda x: '{:.3f}'.format(x))
+    else:
+        df.iloc[:, 1:] = df.iloc[:, 1:].applymap(lambda x: '{:.3f}'.format(x))
+    return df
+
+
 if __name__ == "__main__":
     bbg_df = clean_bbg_data(PAPER_END_DT, data_dir=DATA_DIR)
     one_year_zc_df = clean_one_year_zc(bbg_df.index, PAPER_END_DT, data_dir=DATA_DIR)

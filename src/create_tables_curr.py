@@ -19,8 +19,8 @@ if __name__ == "__main__":
     pd_t = ct.calc_pd(bbg_df)
 
     # Table 1
-    print(ct.calc_table_1(pr_t, pd_t))
+    print(cld.format_df(ct.calc_table_1(pr_t, pd_t), False))
 
     # Table 2
-    print(ct.calc_table_2(bbg_df['index'], pr_t, pd_t))
+    print(cld.format_df(ct.calc_table_2(bbg_df['index'], pr_t, pd_t), True))
     
