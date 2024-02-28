@@ -58,243 +58,190 @@ def copy_notebook_to_folder(notebook_stem, origin_folder, destination_folder):
     return command
 
 
-def task_pull_fred():
-    """ """
-    file_dep = ["./src/load_fred.py"]
-    file_output = ["fred.parquet"]
-    targets = [DATA_DIR / "pulled" / file for file in file_output]
+def task_load_raw():
+    tasks = {
+        'zero_coupon': {
+            'script': 'load_zero_coupon',
+            'target': 'fed_yield_curve.parquet'
+        },
+        'bbg': {
+            'script': 'load_bbg_data',
+            'target': 'bbg_data.parquet'
+        }
+    }
 
+    for task_name, task_info in tasks.items():
+        yield {
+            'name': task_name,
+            'actions': [f'ipython ./src/{task_info["script"]}.py'],
+            'targets': [DATA_DIR / "pulled" / task_info['target']],
+            'file_dep': [f'./src/{task_info["script"]}.py'],
+            'clean': True,
+        }
+
+
+def task_clean_data():
     return {
-        "actions": [
-            "ipython ./src/load_fred.py",
+        'actions': ['ipython ./src/clean_data.py'],
+        'targets': [
+            DATA_DIR / "cleaned" / "clean_one_y_zc_paper.parquet",
+            DATA_DIR / "cleaned" / "clean_bbg_curr_data.parquet",
+            DATA_DIR / "cleaned" / "clean_bbg_paper_data.parquet",
+            DATA_DIR / "cleaned" / "clean_one_y_zc_curr.parquet",
+            # Add more target files as needed
         ],
-        "targets": targets,
-        "file_dep": file_dep,
-        "clean": True,
+        'file_dep': [
+            './src/clean_data.py',
+            DATA_DIR / "pulled" / "fed_yield_curve.parquet",
+            DATA_DIR / "pulled" / "bbg_data.parquet",
+            # Add more file dependencies as needed
+        ],
+        'clean': True,
     }
 
 
-# def task_pull_data_via_presto():
-#     """
-#     Run several data pulls
-
-#     This will run commands like this:
-#     presto-cli --output-format=CSV_HEADER --file=/data/unixhome/src/sql_gross_performance.sql > /data/unixhome/src/sometest.csv
-
-#     """
-#     sql_pulls_dict = {
-#         'sometest.sql':'sometest.csv',
-#     }
-#     file_dep = list(sql_pulls_dict.keys())
-#     file_output = list(sql_pulls_dict.values())
-
-#     targets = [PRIVATE_DATA_DIR / 'sql_pulled' / file for file in file_output]
-
-#     def action_string(sql_file, csv_output):
-#         s = f"""
-#             ssh sql.someurl.com <<-'ENDSSH'
-#             echo Starting Presto Pull Command for {sql_file}
-#             cd {getcwd()}
-#             presto-cli --output-format=CSV_HEADER --file={sql_file} > {csv_output}
-#             """
-#         return s
-#     actions = [
-#                 action_string(sql_file,
-#                               (PRIVATE_DATA_DIR / 'sql_pulled' / sql_pulls_dict[sql_file])
-#                               ) for sql_file in sql_pulls_dict
-#             ]
-#     return {
-#         "actions":actions,
-#         "targets": targets,
-#         'task_dep':[],
-#         "file_dep": file_dep,
-#     }
+def task_create_tables():
+    return {
+        'actions': [
+            'ipython ./src/create_tables.py',
+            'ipython ./src/create_tables_curr.py',
+        ],
+        'targets': [
+            OUTPUT_DIR / "table_1.tex",
+            OUTPUT_DIR / "table_2.tex",
+            OUTPUT_DIR / "table_1_curr.tex",
+            OUTPUT_DIR / "table_2_curr.tex",
+            # Add more target files as needed
+        ],
+        'file_dep': [
+            './src/create_tables.py',
+            './src/create_tables_curr.py',
+            DATA_DIR / "pulled" / "clean_one_y_zc_curr.parquet",
+            DATA_DIR / "pulled" / "clean_bbg_paper_data.parquet",
+            DATA_DIR / "pulled" / "clean_one_y_zc_paper.parquet",
+            DATA_DIR / "pulled" / "clean_bbg_curr_data.parquet",
+            # Add more file dependencies as needed
+        ],
+        'clean': True,
+    }
 
 
 def task_summary_stats():
-    """ """
-    file_dep = ["./src/example_table.py"]
-    file_output = [
-        "example_table.tex",
-        "pandas_to_latex_simple_table1.tex",
-    ]
-    targets = [OUTPUT_DIR / file for file in file_output]
-
     return {
-        "actions": [
-            "ipython ./src/example_table.py",
-            "ipython ./src/pandas_to_latex_demo.py",
+        'actions': [
+            'ipython ./src/create_summary_stats.py',
         ],
-        "targets": targets,
-        "file_dep": file_dep,
-        "clean": True,
-    }
-
-
-def task_example_plot():
-    """Example plots"""
-    file_dep = [Path("./src") / file for file in ["example_plot.py", "load_fred.py"]]
-    file_output = ["example_plot.png"]
-    targets = [OUTPUT_DIR / file for file in file_output]
-
-    return {
-        "actions": [
-            "ipython ./src/example_plot.py",
+        'targets': [
+            OUTPUT_DIR / "summary_stats.tex",
+            # Add more target files as needed
         ],
-        "targets": targets,
-        "file_dep": file_dep,
-        "clean": True,
-    }
-
-
-def task_convert_notebooks_to_scripts():
-    """Preps the notebooks for presentation format.
-    Execute notebooks with summary stats and plots and remove metadata.
-    """
-    build_dir = Path(OUTPUT_DIR)
-    build_dir.mkdir(parents=True, exist_ok=True)
-
-    notebooks = [
-        "01_example_notebook.ipynb",
-        "02_interactive_plot_example.ipynb",
-    ]
-    file_dep = [Path("./src") / file for file in notebooks]
-    stems = [notebook.split(".")[0] for notebook in notebooks]
-    targets = [build_dir / f"_{stem}.py" for stem in stems]
-
-    actions = [
-        # *[jupyter_execute_notebook(notebook) for notebook in notebooks_to_run],
-        # *[jupyter_to_html(notebook) for notebook in notebooks_to_run],
-        *[jupyter_clear_output(notebook) for notebook in stems],
-        *[jupyter_to_python(notebook, build_dir) for notebook in stems],
-    ]
-    return {
-        "actions": actions,
-        "targets": targets,
-        "task_dep": [],
-        "file_dep": file_dep,
-        "clean": True,
-    }
-
-
-def task_run_notebooks():
-    """Preps the notebooks for presentation format.
-    Execute notebooks with summary stats and plots and remove metadata.
-    """
-    notebooks = [
-        "01_example_notebook.ipynb",
-        "02_interactive_plot_example.ipynb",
-    ]
-    stems = [notebook.split(".")[0] for notebook in notebooks]
-
-    file_dep = [
-        # 'load_other_data.py',
-        *[Path(OUTPUT_DIR) / f"_{stem}.py" for stem in stems],
-    ]
-
-    targets = [
-        ## 01_example_notebook.ipynb output
-        OUTPUT_DIR / "sine_graph.png",
-        ## Notebooks converted to HTML
-        *[OUTPUT_DIR / f"{stem}.html" for stem in stems],
-    ]
-
-    actions = [
-        *[jupyter_execute_notebook(notebook) for notebook in stems],
-        *[jupyter_to_html(notebook) for notebook in stems],
-        *[copy_notebook_to_folder(notebook, Path("./src"), "./docs/_notebook_build/") for notebook in stems],
-        *[jupyter_clear_output(notebook) for notebook in stems],
-        # *[jupyter_to_python(notebook, build_dir) for notebook in notebooks_to_run],
-    ]
-    return {
-        "actions": actions,
-        "targets": targets,
-        "task_dep": [],
-        "file_dep": file_dep,
-        "clean": True,
-    }
-
-
-
-
-def task_compile_latex_docs():
-    """Compile the LaTeX documents to PDFs"""
-    file_dep = [
-        "./reports/report_example.tex",
-        "./reports/slides_example.tex",
-        "./src/example_plot.py",
-        "./src/example_table.py",
-    ]
-    file_output = [
-        "./reports/report_example.pdf",
-        "./reports/slides_example.pdf",
-    ]
-    targets = [file for file in file_output]
-
-    return {
-        "actions": [
-            "latexmk -xelatex -cd ./reports/report_example.tex",  # Compile
-            "latexmk -xelatex -c -cd ./reports/report_example.tex",  # Clean
-            "latexmk -xelatex -cd ./reports/slides_example.tex",  # Compile
-            "latexmk -xelatex -c -cd ./reports/slides_example.tex",  # Clean
-            # "latexmk -CA -cd ../reports/",
+        'file_dep': [
+            './src/summary_stats.py',
+            DATA_DIR / "pulled" / "clean_one_y_zc_curr.parquet",
+            DATA_DIR / "pulled" / "clean_bbg_paper_data.parquet",
+            DATA_DIR / "pulled" / "clean_one_y_zc_paper.parquet",
+            DATA_DIR / "pulled" / "clean_bbg_curr_data.parquet",
+            # Add more file dependencies as needed
         ],
-        "targets": targets,
-        "file_dep": file_dep,
-        "clean": True,
+        'clean': True,
     }
+    
 
-
-def task_compile_sphinx_docs():
-    """Compile Sphinx Docs"""
-    file_dep = [
-        "./docs/conf.py",
-        "./docs/index.rst",
-        "./docs/myst_markdown_demos.md",
-        "./docs/api.rst",
-    ]
-    targets = [
-        "./docs/_build/html/index.html",
-        "./docs/_build/html/myst_markdown_demos.html",
-        "./docs/_build/html/api.html",
-    ]
-
-    return {
-        "actions": ["sphinx-build -M html ./docs/ ./docs/_build"],
-        "targets": targets,
-        "file_dep": file_dep,
-        "task_dep": ["run_notebooks"],
-        "clean": True,
-    }
-
-
-# def task_knit_RMarkdown_files():
-#     """Preps the RMarkdown files for presentation format.
-#     This will knit the RMarkdown files for easier sharing of results.
+# def task_convert_notebooks_to_scripts():
+#     """Preps the notebooks for presentation format.
+#     Execute notebooks with summary stats and plots and remove metadata.
 #     """
-#     files_to_knit = [
-#         'shift_share.Rmd',
-#         ]
+#     build_dir = Path(OUTPUT_DIR)
+#     build_dir.mkdir(parents=True, exist_ok=True)
 
-#     files_to_knit_stems = [file.split('.')[0] for file in files_to_knit]
+#     notebooks = [
+#         "01_example_notebook.ipynb",
+#         "02_interactive_plot_example.ipynb",
+#     ]
+#     file_dep = [Path("./src") / file for file in notebooks]
+#     stems = [notebook.split(".")[0] for notebook in notebooks]
+#     targets = [build_dir / f"_{stem}.py" for stem in stems]
+
+#     actions = [
+#         # *[jupyter_execute_notebook(notebook) for notebook in notebooks_to_run],
+#         # *[jupyter_to_html(notebook) for notebook in notebooks_to_run],
+#         *[jupyter_clear_output(notebook) for notebook in stems],
+#         *[jupyter_to_python(notebook, build_dir) for notebook in stems],
+#     ]
+#     return {
+#         "actions": actions,
+#         "targets": targets,
+#         "task_dep": [],
+#         "file_dep": file_dep,
+#         "clean": True,
+#     }
+
+
+# def task_run_notebooks():
+#     """Preps the notebooks for presentation format.
+#     Execute notebooks with summary stats and plots and remove metadata.
+#     """
+#     notebooks = [
+#         "01_example_notebook.ipynb",
+#         "02_interactive_plot_example.ipynb",
+#     ]
+#     stems = [notebook.split(".")[0] for notebook in notebooks]
 
 #     file_dep = [
-#         'load_performance_and_loan_merged.py',
-#         *[file + ".Rmd" for file in files_to_knit_stems],
-#         ]
+#         # 'load_other_data.py',
+#         *[Path(OUTPUT_DIR) / f"_{stem}.py" for stem in stems],
+#     ]
 
-#     file_output = [file + '.html' for file in files_to_knit_stems]
-#     targets = [OUTPUT_DIR / file for file in file_output]
+#     targets = [
+#         ## 01_example_notebook.ipynb output
+#         OUTPUT_DIR / "sine_graph.png",
+#         ## Notebooks converted to HTML
+#         *[OUTPUT_DIR / f"{stem}.html" for stem in stems],
+#     ]
 
-#     def knit_string(file):
-#         return f"""Rscript -e 'library(rmarkdown); rmarkdown::render("{file}.Rmd", output_format="html_document", OUTPUT_DIR="../output/")'"""
-#     actions = [knit_string(file) for file in files_to_knit_stems]
+#     actions = [
+#         *[jupyter_execute_notebook(notebook) for notebook in stems],
+#         *[jupyter_to_html(notebook) for notebook in stems],
+#         *[copy_notebook_to_folder(notebook, Path("./src"), "./docs/_notebook_build/") for notebook in stems],
+#         *[jupyter_clear_output(notebook) for notebook in stems],
+#         # *[jupyter_to_python(notebook, build_dir) for notebook in notebooks_to_run],
+#     ]
+#     return {
+#         "actions": actions,
+#         "targets": targets,
+#         "task_dep": [],
+#         "file_dep": file_dep,
+#         "clean": True,
+#     }
+
+
+
+
+# def task_compile_latex_docs():
+#     """Compile the LaTeX documents to PDFs"""
+#     file_dep = [
+#         "./reports/report_example.tex",
+#         "./reports/slides_example.tex",
+#         "./src/example_plot.py",
+#         "./src/example_table.py",
+#     ]
+#     file_output = [
+#         "./reports/report_example.pdf",
+#         "./reports/slides_example.pdf",
+#     ]
+#     targets = [file for file in file_output]
+
 #     return {
 #         "actions": [
-#                     "module use -a /opt/aws_opt/Modulefiles",
-#                     "module load R/4.2.2",
-#                     *actions],
+#             "latexmk -xelatex -cd ./reports/report_example.tex",  # Compile
+#             "latexmk -xelatex -c -cd ./reports/report_example.tex",  # Clean
+#             "latexmk -xelatex -cd ./reports/slides_example.tex",  # Compile
+#             "latexmk -xelatex -c -cd ./reports/slides_example.tex",  # Clean
+#             # "latexmk -CA -cd ../reports/",
+#         ],
 #         "targets": targets,
-#         'task_dep':[],
 #         "file_dep": file_dep,
+#         "clean": True,
 #     }
+
+
