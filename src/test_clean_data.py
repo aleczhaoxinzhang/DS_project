@@ -47,6 +47,12 @@ def test_clean_bbg_data():
 df = cld.clean_one_year_zc(bbg_df.index, CURR_END_DT, DATA_DIR)
 
 def test_clean_one_year_zc():
+    # Check that the DataFrame is not empty
+    assert not df.empty
+    
+    # Check that the index is a DatetimeIndex
+    assert isinstance(df.index, pd.DatetimeIndex)
+     
     # Check start and end date
     assert df.index.min() >= pd.to_datetime(START_DT)
     assert df.index.max() <= pd.to_datetime(CURR_END_DT)
@@ -63,5 +69,6 @@ def test_clean_one_year_zc():
     # Check if the expected discount factor is calculated directly
     assert np.isclose(df.loc['2017-02-28', '1_y_dis_factor'], 0.990878)
     
-
-    
+    # Check data types
+    assert df.dtypes['1_year_yield'] == float
+    assert df.dtypes['1_y_dis_factor'] == float
