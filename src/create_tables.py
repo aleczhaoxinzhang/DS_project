@@ -57,7 +57,7 @@ def calc_regressions(X, y):
     model = sm.OLS(y, X).fit()
     return model.params.iloc[0], model.rsquared_adj  # Return beta and adjusted R-squared
 
-def calc_table_2(index, pr_t, pd_t):
+def calc_table_2(index, pr_t, pd_t, in_sample_test=True):
     # Calculate epsilon_pr_t and epsilon_pd_t
     epsilon_pr_t = pr_t - sm.OLS(pr_t, sm.add_constant(pd_t)).fit().predict()
     epsilon_pd_t = pd_t - sm.OLS(pd_t, sm.add_constant(pr_t)).fit().predict()
@@ -65,23 +65,22 @@ def calc_table_2(index, pr_t, pd_t):
     # Calculate future one-year S&P 500 returns
     sp500_returns = (index.shift(-12) / index - 1)  # Assuming index is sorted by date
     
-    # Limit to in-sample data
-    in_sample = (index.index >= '1988-01-29') & (index.index <= '1997-12-31')
-    sp500_returns = sp500_returns[in_sample]
-    pr_t = pr_t[in_sample]
-    pd_t = pd_t[in_sample]
-    epsilon_pr_t = epsilon_pr_t[in_sample]
-    epsilon_pd_t = epsilon_pd_t[in_sample]
+    if in_sample_test:
+        # Limit to in-sample data
+        in_sample = (index.index >= '1988-01-29') & (index.index <= '1997-12-31')
+        sp500_returns = sp500_returns[in_sample]
+        pr_t = pr_t[in_sample]
+        pd_t = pd_t[in_sample]
+        epsilon_pr_t = epsilon_pr_t[in_sample]
+        epsilon_pd_t = epsilon_pd_t[in_sample]
     
     # Perform regressions and collect results
-    results = pd.DataFrame(index=['β', 'R²'], columns=['pr_t', 'pd_t', 'epsilon_pr_t', 'epsilon_pd_t'])
+    results = pd.DataFrame(index=['beta', 'adjusted R-squared'], columns=['pr_t', 'pd_t', 'epsilon_pr_t', 'epsilon_pd_t'])
     for var, name in zip([pr_t, pd_t, epsilon_pr_t, epsilon_pd_t], results.columns):
         beta, adj_r_squared = calc_regressions(var, sp500_returns)
-        results.loc['β', name] = beta.round(3)
-        results.loc['R²', name] = adj_r_squared.round(3)
+        results.loc['beta', name] = beta
+        results.loc['adjusted R-squared', name] = adj_r_squared
     
-    results = results.astype(float)
-
     return results
 
 

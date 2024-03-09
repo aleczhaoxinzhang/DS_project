@@ -2,6 +2,8 @@ import pytest
 import config
 import clean_data as cld
 import create_tables as ct
+import load_zero_coupon as ldzc
+import load_bbg_data as lbbg
 
 from create_tables import calc_table_1, calc_table_2
 

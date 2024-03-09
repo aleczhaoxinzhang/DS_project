@@ -66,15 +66,20 @@ def task_load_raw():
         },
         'bbg': {
             'script': 'load_bbg_data',
-            'target': 'bbg_data.parquet'
+            'target': ['bbg_data.parquet', 'bbg_future_data.parquet', 'bbg_maturity_data.parquet']
         }
     }
 
     for task_name, task_info in tasks.items():
+        if isinstance(task_info['target'], list):
+            targets = [DATA_DIR / "pulled" / task_name / target for target in task_info['target']]
+        else:
+            targets = [DATA_DIR / "pulled" / task_name / task_info['target']]
+
         yield {
             'name': task_name,
             'actions': [f'ipython ./src/{task_info["script"]}.py'],
-            'targets': [DATA_DIR / "pulled" / task_info['target']],
+            'targets': targets,
             'file_dep': [f'./src/{task_info["script"]}.py'],
             'clean': True,
         }
@@ -94,6 +99,8 @@ def task_clean_data():
             './src/clean_data.py',
             DATA_DIR / "pulled" / "fed_yield_curve.parquet",
             DATA_DIR / "pulled" / "bbg_data.parquet",
+            DATA_DIR / "pulled" / "bbg_future_data.parquet",
+            DATA_DIR / "pulled" / "bbg_maturity_data.parquet",
             # Add more file dependencies as needed
         ],
         'clean': True,

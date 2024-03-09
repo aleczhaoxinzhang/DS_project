@@ -16,9 +16,20 @@ OUTPUT_DIR = config.OUTPUT_DIR
 if __name__ == "__main__":
     one_year_zc_df = ldzc.load_clean_fed_yield_curve(CURR_END_DT, data_dir=DATA_DIR)
     bbg_df = lbbg.load_clean_bbg_data(CURR_END_DT, data_dir=DATA_DIR)
+    print(bbg_df)
+    print(one_year_zc_df.tail())
 
     pr_t = ct.calc_pr(bbg_df, one_year_zc_df)
     pd_t = ct.calc_pd(bbg_df)
+    
+    # Check for NaN or Inf values in pr_t
+    print("NaN or Inf values in pr_t:")
+    print(pr_t[np.isnan(pr_t) | np.isinf(pr_t)])
+    
+    # Check for NaN or Inf values in pd_t
+    print("NaN or Inf values in pd_t:")
+    print(pd_t[np.isnan(pd_t) | np.isinf(pd_t)])
+
 
     # Table 1
     table_1_curr = cld.format_df(ct.calc_table_1(pr_t, pd_t), False)
@@ -27,7 +38,7 @@ if __name__ == "__main__":
     table_1_curr.to_latex(path, index=True)
 
     # Table 2
-    table_2_curr = cld.format_df(ct.calc_table_2(bbg_df['index'], pr_t, pd_t), True)
+    table_2_curr = cld.format_df(ct.calc_table_2(bbg_df['index'], pr_t, pd_t, False), True)
     print(table_2_curr)
     path = Path(OUTPUT_DIR) / "table_2_curr.tex"
     table_2_curr.to_latex(path, index=True)

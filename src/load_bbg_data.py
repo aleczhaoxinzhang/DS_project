@@ -30,17 +30,32 @@ if USE_BBG:
 else:
     # this function will be changed to xbbg code at the end
     def load_bbg_excel(data_dir=DATA_DIR):
+        # load dividend yield and index data from excel
         path = data_dir / 'manual' / 'bbg_data_v2.xlsx'
         df = pd.read_excel(path, sheet_name='Sheet2')
-        df = df[['Date', 'dividend yield', 'index', 'futures']]
+        df = df[['Date', 'dividend yield', 'index']]
         df.set_index('Date', inplace=True)
         df.index = pd.to_datetime(df.index)
-        return df
+
+        # load futures data
+        path = data_dir / 'manual' / 'bbg_data_futures.xlsx'
+        future_df = pd.read_excel(path, sheet_name='future prices')
+        maturity_df = pd.read_excel(path, sheet_name='maturities')
+        future_df.set_index('Date', inplace=True)
+        future_df.index = pd.to_datetime(future_df.index)
+        maturity_df.set_index('Date', inplace=True)
+        maturity_df.index = pd.to_datetime(maturity_df.index)
+        return df, future_df, maturity_df
 
 def load_bbg_data(data_dir=DATA_DIR):
     path = data_dir / "pulled" / "bbg_data.parquet"
     _df = pd.read_parquet(path)
-    return _df
+    path = Path(DATA_DIR) / "pulled" / "bbg_future_data.parquet"
+    _future_df = pd.read_parquet(path)
+    path = Path(DATA_DIR) / "pulled" / "bbg_maturity_data.parquet"
+    _maturity_df = pd.read_parquet(path)
+
+    return _df, _future_df, _maturity_df
 
 
 def load_clean_bbg_data(end_date, data_dir=DATA_DIR):
@@ -58,10 +73,15 @@ if __name__ == "__main__":
     if USE_BBG:
         bbg_df = pull_bbg_data(CURR_END_DT)
     else:
-        bbg_df = load_bbg_excel()
+        bbg_df, future_df, maturity_df = load_bbg_excel()
     
     path = Path(DATA_DIR) / "pulled" / "bbg_data.parquet"
     bbg_df.to_parquet(path)
-    # print(bbg_df['futures'])
+    path = Path(DATA_DIR) / "pulled" / "bbg_future_data.parquet"
+    future_df.to_parquet(path)
+    path = Path(DATA_DIR) / "pulled" / "bbg_maturity_data.parquet"
+    maturity_df.to_parquet(path)
+
+    # print(maturity_df)
     
     

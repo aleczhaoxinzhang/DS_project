@@ -5,6 +5,7 @@ import config
 import numpy as np
 import math
 from pathlib import Path
+from scipy.interpolate import PchipInterpolator
 
 DATA_DIR = config.DATA_DIR
 USE_BBG = config.USE_BBG
@@ -24,9 +25,39 @@ if USE_BBG:
         return df.groupby([df.index.year, df.index.month]).tail(1)
 else:
     def clean_bbg_data(end_date, data_dir=DATA_DIR):
-        df = lbbg.load_bbg_data(data_dir)
+        df, future_df, maturity_df = lbbg.load_bbg_data(data_dir)
 
         df = df.loc[START_DT : end_date]
+        future_df = future_df.loc[START_DT : end_date]
+        maturity_df = maturity_df.loc[START_DT : end_date]
+
+        for index, row in maturity_df.iterrows():
+            # Count the number of zeros in the row
+            zero_count = (row == 0).sum()
+            
+            # If there are exactly two zeros
+            if zero_count > 1:
+                # Find the indices of the columns with zero values
+                zero_cols = row[row == 0].index
+                # Update the second column with zero value to -1
+                maturity_df.loc[index, zero_cols[1]] = -1
+        
+        future_df = future_df[maturity_df >= 0]
+        maturity_df = maturity_df[maturity_df >= 0]
+
+        interpolated_futures = []
+        for date in future_df.index:
+            # Constructing a new DataFrame
+            new_df = pd.DataFrame({
+                'future': future_df.loc[date],
+                'maturity': maturity_df.loc[date]
+                })
+            # Dropping rows with NaN values in the first column
+            new_df = new_df.dropna(subset=['future'])
+            interpolator = PchipInterpolator(new_df['maturity'], new_df['future'])
+            interpolated_futures.append(interpolator([12])[0])
+        
+        df['futures'] = interpolated_futures
 
         return df
 
@@ -74,6 +105,7 @@ if __name__ == "__main__":
 
     # Clean the data up to the current end date
     bbg_df = clean_bbg_data(CURR_END_DT, data_dir=DATA_DIR)
+
     one_year_zc_df = clean_one_year_zc(bbg_df.index, CURR_END_DT, data_dir=DATA_DIR)
 
     path = Path(DATA_DIR) / "pulled" / "clean_bbg_curr_data.parquet"
