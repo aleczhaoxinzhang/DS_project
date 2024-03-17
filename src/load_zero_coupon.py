@@ -1,3 +1,10 @@
+"""
+This module contains functions to load the zero coupon yield curve from the Federal Reserve.
+It saves the pulled raw data to a parquet file for future use.
+Functions to load the raw/clean data from the parquet file are also provided for future use.
+
+"""
+
 import pandas as pd
 import requests
 from io import BytesIO

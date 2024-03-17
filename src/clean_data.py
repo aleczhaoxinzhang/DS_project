@@ -1,3 +1,12 @@
+"""
+This module cleans the raw data from Bloomberg and the Federal Reserve.
+The 1-year expiry future prices throughout the period are interpolated from the active futures data.
+It saves the both the paper and current end date cleaned data to separate parquet files for future use.
+The module also selects the 1-year zero-coupon yield corresponding to the Bloomberg dates, and saves the 
+discount factors to a parquet file for future use.
+
+"""
+
 import pandas as pd
 import load_zero_coupon as ldzc
 import load_bbg_data as lbbg

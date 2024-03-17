@@ -1,11 +1,10 @@
 from decouple import config
 from pathlib import Path
-
+ 
 BASE_DIR = Path(__file__).parent.parent
 
 DATA_DIR = config('DATA_DIR', default=BASE_DIR / 'data/', cast=Path)
 OUTPUT_DIR = config('OUTPUT_DIR', default=BASE_DIR / 'output/', cast=Path)
-WRDS_USERNAME = config("WRDS_USERNAME", default="")
 
 USE_BBG = False
 START_DT = "1988-01-29"
