@@ -1,3 +1,10 @@
+"""
+This module loads the S&P 500 index, Dividend yields, and all active futures during 
+the given period from Bloomberg. It then saves the pulled raw data to separate parquet files for future use.
+Functions to load the raw/clean data from the parquet file are also provided for future use.
+
+"""
+
 import pandas as pd
 import load_zero_coupon as zc
 import config

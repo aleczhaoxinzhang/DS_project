@@ -1,3 +1,8 @@
+"""
+This script creates summary statistics for the dividend yield, index, futures, and 1-year zero coupon bond yield and discount factor.
+
+"""
+
 import pandas as pd
 import load_zero_coupon as ldzc
 import load_bbg_data as lbbg

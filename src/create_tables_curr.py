@@ -1,3 +1,9 @@
+"""
+This module calculates pr_t and pd_t from the previosuly cleaned current end date data, 
+and replicates Table 1 and Table 2 for the current end date.
+
+"""
+
 import pandas as pd
 import load_zero_coupon as ldzc
 import load_bbg_data as lbbg
@@ -16,8 +22,6 @@ OUTPUT_DIR = config.OUTPUT_DIR
 if __name__ == "__main__":
     one_year_zc_df = ldzc.load_clean_fed_yield_curve(CURR_END_DT, data_dir=DATA_DIR)
     bbg_df = lbbg.load_clean_bbg_data(CURR_END_DT, data_dir=DATA_DIR)
-    print(bbg_df)
-    print(one_year_zc_df.tail())
 
     pr_t = ct.calc_pr(bbg_df, one_year_zc_df)
     pd_t = ct.calc_pd(bbg_df)
@@ -29,6 +33,10 @@ if __name__ == "__main__":
     # Check for NaN or Inf values in pd_t
     print("NaN or Inf values in pd_t:")
     print(pd_t[np.isnan(pd_t) | np.isinf(pd_t)])
+
+    # Check for NaN or Inf values in bbg_df['index']
+    print("NaN or Inf values in bbg_df['index']:")
+    print(bbg_df['index'][np.isnan(bbg_df['index']) | np.isinf(bbg_df['index'])])
 
 
     # Table 1
