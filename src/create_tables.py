@@ -2,7 +2,6 @@
 This module calculates pr_t and pd_t from the previosuly cleaned data and replicates Table 1 and Table 2.
 
 """
-
 import pandas as pd
 import load_zero_coupon as ldzc
 import load_bbg_data as lbbg
@@ -57,40 +56,43 @@ def calc_table_1(series1, series2):
     return stats_df
 
 
-def calc_regressions(X, y):
+def calc_regressions(X, y, pred_X):
     X = sm.add_constant(X)  # Add a constant term
     model = sm.OLS(y, X).fit()
-    return model.params.iloc[1], model.rsquared_adj  # Return beta and adjusted R-squared
+    pred_y = model.predict(np.array([[1, pred_X]]))
+    return model.params.iloc[1], model.rsquared_adj, pred_y  # Return beta and adjusted R-squared
 
-def calc_table_2(index, pr_t, pd_t, in_sample_test=True):
+def calc_table_2(index, pr_t, pd_t):
     # Calculate epsilon_pr_t and epsilon_pd_t
     epsilon_pr_t = pr_t - sm.OLS(pr_t, pd_t).fit().predict()
     epsilon_pd_t = pd_t - sm.OLS(pd_t, pr_t).fit().predict()
     
     # Calculate future one-year S&P 500 returns
-    sp500_returns = (index.shift(-12) / index - 1)  # Assuming index is sorted by date
-    
-    if in_sample_test:
-        # Limit to in-sample data
-        in_sample = (index.index >= '1988-01-29') & (index.index <= '1997-12-31')
-        sp500_returns = sp500_returns[in_sample]
-        pr_t = pr_t[in_sample]
-        pd_t = pd_t[in_sample]
-        epsilon_pr_t = epsilon_pr_t[in_sample]
-        epsilon_pd_t = epsilon_pd_t[in_sample]
-    else:
-        sp500_returns = sp500_returns[0:-12]
-        pr_t = pr_t[0:-12]
-        pd_t = pd_t[0:-12]
-        epsilon_pr_t = epsilon_pr_t[0:-12]
-        epsilon_pd_t = epsilon_pd_t[0:-12]
-    
-    # Perform regressions and collect results
-    results = pd.DataFrame(index=['beta', 'R^2'], columns=['pr_t', 'pd_t', 'epsilon_pr_t', 'epsilon_pd_t'])
-    for var, name in zip([pr_t, pd_t, epsilon_pr_t, epsilon_pd_t], results.columns):
-        beta, adj_r_squared = calc_regressions(var, sp500_returns)
-        results.loc['beta', name] = beta
-        results.loc['R^2', name] = adj_r_squared
+    sp500_returns = (index.shift(-12) / index - 1)
+
+    beta_dict = {'pr_t':[], 'pd_t':[], 'epsilon_pr_t':[], 'epsilon_pd_t':[]}
+
+    oos_R_dict = {'pr_t_num':[], 'pr_t_den':[], 'pd_t_num':[], 'pd_t_den':[], 
+                  'epsilon_pr_t_num':[], 'epsilon_pr_t_den':[], 
+                  'epsilon_pd_t_num':[], 'epsilon_pd_t_den':[]}
+
+    results = pd.DataFrame(index=['beta', 'R^2', 'OOS_R^2'], columns=['pr_t', 'pd_t', 'epsilon_pr_t', 'epsilon_pd_t'])
+
+    for date in sp500_returns.loc['1997-12-31':][0:-12].index:
+        for var, name in zip([pr_t, pd_t, epsilon_pr_t, epsilon_pd_t], results.columns):
+            beta, adj_r_squared, r_hat = calc_regressions(var.loc[:date], sp500_returns.loc[:date], var.loc[date:].iloc[1])
+            beta_dict[name].append(beta)
+            if date <= sp500_returns[0:-12].index[-13]:
+                oos_R_dict[name + '_num'].append((sp500_returns.loc[date:].iloc[1] - r_hat)**2)
+                oos_R_dict[name + '_den'].append((sp500_returns.loc[date:].iloc[1] - sp500_returns.loc[date:].iloc[1:13].mean())**2)
+            if date == sp500_returns.loc['1997-12-31':].index[0]:
+                results.loc['R^2', name] = adj_r_squared
+
+    results.loc['beta'] = pd.DataFrame(beta_dict).mean()
+
+    for name in results.columns:
+        results.loc['OOS_R^2', name] = 1 - pd.DataFrame(oos_R_dict).sum()[name + '_num'] / pd.DataFrame(oos_R_dict).sum()[name + '_den']
+    # print(sp500_returns.loc['1997-12-31':][0:-12].index[-1])
     
     return results
 
