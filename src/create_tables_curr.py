@@ -46,7 +46,7 @@ if __name__ == "__main__":
     table_1_curr.to_latex(path, index=True)
 
     # Table 2
-    table_2_curr = cld.format_df(ct.calc_table_2(bbg_df['index'], pr_t, pd_t, False), True)
+    table_2_curr = cld.format_df(ct.calc_table_2(bbg_df['index'], pr_t, pd_t), True)
     print(table_2_curr)
     path = Path(OUTPUT_DIR) / "table_2_curr.tex"
     table_2_curr.to_latex(path, index=True)
