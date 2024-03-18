@@ -82,9 +82,9 @@ def calc_table_2(index, pr_t, pd_t):
         for var, name in zip([pr_t, pd_t, epsilon_pr_t, epsilon_pd_t], results.columns):
             beta, adj_r_squared, r_hat = calc_regressions(var.loc[:date], sp500_returns.loc[:date], var.loc[date:].iloc[1])
             beta_dict[name].append(beta)
-            if date <= sp500_returns[0:-12].index[-13]:
+            if date <= sp500_returns[0:-13].index[-1]:
                 oos_R_dict[name + '_num'].append((sp500_returns.loc[date:].iloc[1] - r_hat)**2)
-                oos_R_dict[name + '_den'].append((sp500_returns.loc[date:].iloc[1] - sp500_returns.loc[date:].iloc[1:13].mean())**2)
+                oos_R_dict[name + '_den'].append((sp500_returns.loc[date:].iloc[1] - sp500_returns.loc[:date].iloc[:-12].mean())**2)
             if date == sp500_returns.loc['1997-12-31':].index[0]:
                 results.loc['R^2', name] = adj_r_squared
 
@@ -92,7 +92,6 @@ def calc_table_2(index, pr_t, pd_t):
 
     for name in results.columns:
         results.loc['OOS_R^2', name] = 1 - pd.DataFrame(oos_R_dict).sum()[name + '_num'] / pd.DataFrame(oos_R_dict).sum()[name + '_den']
-    # print(sp500_returns.loc['1997-12-31':][0:-12].index[-1])
     
     return results
 
