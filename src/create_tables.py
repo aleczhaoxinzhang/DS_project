@@ -76,7 +76,7 @@ def calc_table_2(index, pr_t, pd_t):
                   'epsilon_pr_t_num':[], 'epsilon_pr_t_den':[], 
                   'epsilon_pd_t_num':[], 'epsilon_pd_t_den':[]}
 
-    results = pd.DataFrame(index=['beta', 'R^2', 'OOS_R^2'], columns=['pr_t', 'pd_t', 'epsilon_pr_t', 'epsilon_pd_t'])
+    results = pd.DataFrame(index=['beta', 'R^2', 'OOS R^2'], columns=['pr_t', 'pd_t', 'epsilon_pr_t', 'epsilon_pd_t'])
 
     for date in sp500_returns.loc['1997-12-31':][0:-12].index:
         for var, name in zip([pr_t, pd_t, epsilon_pr_t, epsilon_pd_t], results.columns):
@@ -91,7 +91,7 @@ def calc_table_2(index, pr_t, pd_t):
     results.loc['beta'] = pd.DataFrame(beta_dict).mean()
 
     for name in results.columns:
-        results.loc['OOS_R^2', name] = 1 - pd.DataFrame(oos_R_dict).sum()[name + '_num'] / pd.DataFrame(oos_R_dict).sum()[name + '_den']
+        results.loc['OOS R^2', name] = 1 - pd.DataFrame(oos_R_dict).sum()[name + '_num'] / pd.DataFrame(oos_R_dict).sum()[name + '_den']
     
     return results
 
@@ -106,13 +106,19 @@ if __name__ == "__main__":
     #Table 1
     table_1 = cld.format_df(calc_table_1(pr_t, pd_t), False)
     print(table_1)
+    table_1.columns = table_1.columns.str.replace('%', r'\%')
+    table_1.columns = table_1.columns.str.replace('ρ', r'$\rho$')
     path = Path(OUTPUT_DIR) / "table_1.tex"
     table_1.to_latex(path, index=True)
 
     #Table 2
     table_2 = cld.format_df(calc_table_2(bbg_df['index'], pr_t, pd_t), True)
     print(table_2)
+    table_2.index = table_2.index.map(lambda x: f"${x}$")
+    table_2.columns = table_2.columns.map(lambda x: f"${x}$")
+    table_2.columns = table_2.columns.str.replace('epsilon_pr_t', r'\epsilon^{pr}_t')
+    table_2.columns = table_2.columns.str.replace('epsilon_pd_t', r'\epsilon^{pd}_t')
     path = Path(OUTPUT_DIR) / "table_2.tex"
-    table_2.to_latex(path, index=True)
+    table_2.to_latex(path, index=True, escape=False)
 
     
