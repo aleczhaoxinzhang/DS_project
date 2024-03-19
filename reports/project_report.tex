@@ -75,14 +75,7 @@ pd_t = \ln \left(\frac{P_t}{D_t} \right)
 Here is the replicated Table1 in the article
 \begin{table}[H]
 \centering
-\begin{tabular}{lrlllllllll}
-    \toprule
-    & obs & mean & std & min & 25\% & 50\% & 75\% & max & $\rho$ & Correlation \\
-    \midrule
-    pr & 354 & 3.760 & 1.024 & 2.348 & 2.926 & 3.323 & 4.657 & 6.179 & 0.962 & 0.137 \\
-    pd & 354 & 3.868 & 0.304 & 3.241 & 3.602 & 3.887 & 4.034 & 4.551 & 0.990 & 0.137 \\
-    \bottomrule
-\end{tabular}
+\input{../output/table_1.tex}
 \caption*{Table 1: Summary Statistics}
 \label{tab:your_label}
 \end{table}
@@ -90,14 +83,7 @@ Here is the replicated Table1 in the article
 Here is the Table1 with updated numbers, which means using data until 2024-01-31
 \begin{table}[H]
 \centering
-\begin{tabular}{lrlllllllll}
-    \toprule
-     & obs & mean & std & min & 25\% & 50\% & 75\% & max & $\rho$ & Correlation \\
-    \midrule
-    pr & 433 & 3.857 & 1.058 & 2.348 & 2.994 & 3.515 & 4.697 & 7.104 & 0.958 & 0.192 \\
-    pd & 433 & 3.904 & 0.291 & 3.241 & 3.763 & 3.928 & 4.089 & 4.551 & 0.988 & 0.192 \\
-    \bottomrule
-\end{tabular}
+\input{../output/table_1_curr.tex}
 \caption*{Table 1: Updated Summary Statistics}
 \label{tab:your_label}
 \end{table}
@@ -110,14 +96,7 @@ residuals after projecting on them.
 Here is the replicated Table2 in the article
 \begin{table}[H]
 \centering
-\begin{tabular}{lllll}
-    \toprule
-     & $pr_t$ & $pd_t$ & $\epsilon^{pr}_t$ & $\epsilon^{pd}_t$ \\
-    \midrule
-    $\beta$ & 0.465 & -0.500 & 0.012 & 0.203 \\
-    $R^2$ & 0.054 & 0.106 & 0.155 & 0.120 \\
-    \bottomrule
-\end{tabular}
+\input{../output/table_2.tex}
 \caption*{Table 2: One-year Return Prediction}
 \label{tab:your_label}
 \end{table}    
@@ -125,14 +104,7 @@ Here is the replicated Table2 in the article
 Here is the Table2 with updated numbers, which means using data until 2024-01-31
 \begin{table}[H]
     \centering
-    \begin{tabular}{lllll}
-        \toprule
-         & $pr_t$ & $pd_t$ & $\epsilon^{pr}_t$ & $\epsilon^{pd}_t$ \\
-        \midrule
-        $\beta$ & 0.465 & -0.500 & -0.008 & 0.208 \\
-        $R^2$ & 0.054 & 0.106 & 0.208 & 0.124 \\
-        \bottomrule
-    \end{tabular}
+    \input{../output/table_2_curr.tex}
     \caption*{Table 2: Updated One-year Return Prediction}
     \label{tab:your_label}
     \end{table}   
@@ -145,17 +117,7 @@ zero-coupon yields, and the corresponding discounting factor.
 
 \begin{table}[H]
 \centering
-\begin{tabular}{lrllllllll}
-    \toprule
-     & obs & mean & std & min & 25\% & 50\% & 75\% & max & $\rho$ \\
-    \midrule
-    Dividend Yield & 354 & 2.187 & 0.666 & 1.056 & 1.770 & 2.051 & 2.727 & 3.914 & 0.988 \\
-    Index & 354 & 1076.526 & 542.016 & 257.070 & 536.238 & 1117.885 & 1379.128 & 2423.410 & 0.996 \\
-    Futures & 354 & 1077.047 & 540.954 & 257.050 & 536.800 & 1120.375 & 1382.875 & 2421.000 & 0.996 \\
-    1-Year Yield & 354 & 3.489 & 2.637 & 0.099 & 0.663 & 3.655 & 5.542 & 9.658 & 0.996 \\
-    1-Year Discount Factor & 354 & 0.966 & 0.025 & 0.908 & 0.946 & 0.964 & 0.993 & 0.999 & 0.996 \\
-    \bottomrule
-\end{tabular}
+\input{../output/summary_stats.tex}
 \caption*{Table 3: Summary Statistics for Source Data}
 \label{tab:your_label}
 \end{table}    
@@ -171,33 +133,28 @@ to Jan 2024 for creating up-to-date tables.
 
 \section{Successes and Challenges}
 In our endeavor to replicate the seminal study, we successfully 
-adhered to the paper's logic and replication methodology. Our 
-access to and automation of data extraction were particularly 
-noteworthy; we were able to seamlessly retrieve Bloomberg data, 
-mirroring the process utilized by the original authors. Moreover, 
-our replication of \( pd_t \) revealed only minimal discrepancies 
-in comparison to the published results. Significantly, we achieved 
-complete automation of the replication and table generation 
-processes, all operationalized through a single 'doit' command. 
-The thoroughness of our replication was affirmed by the successful 
-passage of all unit tests within reasonable tolerance levels.
+adhered to the paper's logic and replication methodology. Our access 
+to and automation of data extraction were particularly noteworthy; 
+we were able to seamlessly retrieve data, mirroring the process utilized 
+by the original authors. Moreover, our replication of $pd_t$ and $pr_t$ 
+revealed only minimal discrepancies in comparison to the published results. 
+Significantly, we achieved complete automation of the replication and 
+table generation processes, all operationalized through a single 'doit' 
+command. The thoroughness of our replication was affirmed by the 
+successful passage of all unit tests within reasonable tolerance levels.
 \newline
 \newline
-Despite these successes, we encountered several obstacles. Most 
-notably, we were unable to access the Fama-Bliss database, which 
-was the source of the 1-year zero-coupon yields in the original 
-research. To circumvent this, we sourced the data from the Federal 
-Reserve's website, although this introduced some methodological 
-differences. The yields from the Federal Reserve are spot rates, 
-which may not align with the non-standard rates used in the 
-Fama-Bliss database, potentially leading to discrepancies in 
-our calculated \( pr_t \) and the ultimate findings. Furthermore, 
-the lack of a singular Bloomberg formula to extract all 1-year 
-expiry S\&P500 future prices from January 1988 to January 2024 
-posed a significant challenge. We were compelled to merge data 
-extracted using two distinct Bloomberg formulas since one formula 
-was limited to data only up to August 1997. This data fusion was 
-necessary to ensure a complete dataset for the required period.
+Despite these successes, we encountered several obstacles. Most notably, 
+we were unable to access the Fama-Bliss database, which was the 
+source of the 1-year zero-coupon yields in the original research. To 
+circumvent this, we sourced the data from the Federal Reserve's website, 
+although this introduced some methodological differences. The yields 
+from the Federal Reserve are spot rates, which may not align with the 
+non-standard rates used in the Fama-Bliss database, potentially leading 
+to discrepancies in our calculated $pr_t$ and the ultimate findings. 
+Furthermore, discrepancies were noted in the Beta values of the 
+replicated table compared to those reported in the original paper.
+
 
 
 
