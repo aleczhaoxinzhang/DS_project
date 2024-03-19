@@ -1,12 +1,17 @@
 import pandas as pd
 import numpy as np
+<<<<<<< HEAD
 import create_tables_curr as ctc
 import create_tables as ct
 import clean_data as cld
+=======
+import create_tables_curr as ct
+>>>>>>> main
 
 import config
 
 DATA_DIR = config.DATA_DIR
+<<<<<<< HEAD
 CURR_END_DT = config.CURR_END_DT
 
 bbg_df = cld.clean_bbg_data(CURR_END_DT, data_dir=DATA_DIR)
@@ -18,6 +23,11 @@ pd_t = ct.calc_pd(bbg_df)
 # Tolerances for each column
 tolerances = {
     'obs': 0.00,
+=======
+
+# Tolerances for each column
+tolerances = {
+>>>>>>> main
     'mean': 0.01,
     'std': 0.01,
     'min': 0.01,
@@ -37,7 +47,11 @@ tolerances = {
 # Test function for Table 1
 def test_table1():
     # Use the actual output of ct.calc_table_1(pr_t, pd_t)
+<<<<<<< HEAD
     table1 = ct.calc_table_1(pr_t, pd_t)
+=======
+    table1 = ct.calc_table_1(ct.pr_t, ct.pd_t)
+>>>>>>> main
     
     # Define the expected (desired) values for Table 1
     expected_table1 = pd.DataFrame({'obs': [433, 433], 'mean': [3.857, 3.904], 'std': [1.058, 0.291],
@@ -69,11 +83,18 @@ def test_table1():
     for col in expected_table1.columns:
         assert np.allclose(table1[col], expected_table1[col], atol=tolerances[col]), f"Column {col} in Table 1 exceeds tolerance of {tolerances[col]}"
 
+<<<<<<< HEAD
 
 # Test function for Table 2
 def test_table2():
     # Use the actual output of ct.calc_table_2(bbg_df['index'], pr_t, pd_t)
     table2 = ct.calc_table_2(bbg_df['index'], pr_t, pd_t)
+=======
+# Test function for Table 2
+def test_table2():
+    # Use the actual output of ct.calc_table_2(bbg_df['index'], pr_t, pd_t)
+    table2 = ct.calc_table_2(ct.bbg_df['index'], ct.pr_t, ct.pd_t)
+>>>>>>> main
     
     # Define the expected (desired) values for Table 2
     expected_table2 = pd.DataFrame({'pr_t': [0.01, 0.02], 'pd_t': [0.03, 0.04], 'epsilon_pr_t': [0.05, 0.06], 'epsilon_pd_t': [0.07, 0.08]})
