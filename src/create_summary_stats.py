@@ -51,7 +51,16 @@ if __name__ == "__main__":
     summary_stats_df = cld.format_df(summary_stats(bbg_df['dividend yield'], bbg_df['index'], 
                                       bbg_df['futures'], one_year_zc_df['1_year_yield'], 
                                       one_year_zc_df['1_y_dis_factor']), False)
+    summary_stats_df.index = [
+    "Dividend Yield",
+    "Index",
+    "Futures",
+    "1-Year Yield",
+    "1-Year Discount Factor"
+    ]   
     print(summary_stats_df)
+    summary_stats_df.columns = summary_stats_df.columns.str.replace('%', r'\%')
+    summary_stats_df.columns = summary_stats_df.columns.str.replace('ρ', r'$\rho$')
     path = Path(OUTPUT_DIR) / "summary_stats.tex"
     summary_stats_df.to_latex(path, index=True)
     
