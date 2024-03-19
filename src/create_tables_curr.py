@@ -41,6 +41,8 @@ if __name__ == "__main__":
 
     # Table 1
     table_1_curr = cld.format_df(ct.calc_table_1(pr_t, pd_t), False)
+    table_1_curr.columns = table_1_curr.columns.str.replace('%', r'\%')
+    table_1_curr.columns = table_1_curr.columns.str.replace('ρ', r'$\rho$')
     print(table_1_curr)
     path = Path(OUTPUT_DIR) / "table_1_curr.tex"
     table_1_curr.to_latex(path, index=True)
@@ -48,6 +50,10 @@ if __name__ == "__main__":
     # Table 2
     table_2_curr = cld.format_df(ct.calc_table_2(bbg_df['index'], pr_t, pd_t), True)
     print(table_2_curr)
+    table_2_curr.index = table_2_curr.index.map(lambda x: f"${x}$")
+    table_2_curr.columns = table_2_curr.columns.map(lambda x: f"${x}$")
+    table_2_curr.columns = table_2_curr.columns.str.replace('epsilon_pr_t', r'\epsilon^{pr}_t')
+    table_2_curr.columns = table_2_curr.columns.str.replace('epsilon_pd_t', r'\epsilon^{pd}_t')
     path = Path(OUTPUT_DIR) / "table_2_curr.tex"
     table_2_curr.to_latex(path, index=True)
 
