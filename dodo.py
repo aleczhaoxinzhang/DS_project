@@ -1,4 +1,5 @@
-"""Run or update the project. This file uses the `doit` Python package. It works
+"""
+Run or update the project. This file uses the `doit` Python package. It works
 like a Makefile, but is Python-based
 """
 
