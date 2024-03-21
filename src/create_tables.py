@@ -64,13 +64,15 @@ def calc_regressions(X, y, pred_X):
 
 def calc_table_2(index, pr_t, pd_t):
     # Calculate epsilon_pr_t and epsilon_pd_t
-    epsilon_pr_t = pr_t - sm.OLS(pr_t, pd_t).fit().predict()
-    epsilon_pd_t = pd_t - sm.OLS(pd_t, pr_t).fit().predict()
+    epsilon_pr_t = pr_t - sm.OLS(pr_t, sm.add_constant(pd_t)).fit().predict()
+    epsilon_pd_t = pd_t - sm.OLS(pd_t, sm.add_constant(pr_t)).fit().predict()
     
     # Calculate future one-year S&P 500 returns
     sp500_returns = (index.shift(-12) / index - 1)
 
     beta_dict = {'pr_t':[], 'pd_t':[], 'epsilon_pr_t':[], 'epsilon_pd_t':[]}
+
+    R_dict = {'pr_t':[], 'pd_t':[], 'epsilon_pr_t':[], 'epsilon_pd_t':[]}
 
     oos_R_dict = {'pr_t_num':[], 'pr_t_den':[], 'pd_t_num':[], 'pd_t_den':[], 
                   'epsilon_pr_t_num':[], 'epsilon_pr_t_den':[], 
@@ -82,13 +84,15 @@ def calc_table_2(index, pr_t, pd_t):
         for var, name in zip([pr_t, pd_t, epsilon_pr_t, epsilon_pd_t], results.columns):
             beta, adj_r_squared, r_hat = calc_regressions(var.loc[:date], sp500_returns.loc[:date], var.loc[date:].iloc[1])
             beta_dict[name].append(beta)
+            R_dict[name].append(adj_r_squared)
             if date <= sp500_returns[0:-13].index[-1]:
                 oos_R_dict[name + '_num'].append((sp500_returns.loc[date:].iloc[1] - r_hat)**2)
                 oos_R_dict[name + '_den'].append((sp500_returns.loc[date:].iloc[1] - sp500_returns.loc[:date].iloc[:-12].mean())**2)
-            if date == sp500_returns.loc['1997-12-31':].index[0]:
-                results.loc['R^2', name] = adj_r_squared
+            # if date == sp500_returns.loc['1997-12-31':].index[0]:
+            #     results.loc['R^2', name] = adj_r_squared
 
     results.loc['beta'] = pd.DataFrame(beta_dict).mean()
+    results.loc['R^2'] = pd.DataFrame(R_dict).mean()
 
     for name in results.columns:
         results.loc['OOS R^2', name] = 1 - pd.DataFrame(oos_R_dict).sum()[name + '_num'] / pd.DataFrame(oos_R_dict).sum()[name + '_den']

@@ -1,3 +1,8 @@
+"""
+This configuration module sets up the directory structure and global settings for the project.
+It defines the base, data, and output directories, as well as key date parameters for the analysis.
+"""
+
 from decouple import config
 from pathlib import Path
  
